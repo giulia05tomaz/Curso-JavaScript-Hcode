@@ -7,7 +7,7 @@ Calculadora desenvolvida como exemplo do Curso Completo de JavaScript na Udemy.c
 ### Projeto
 ![Calculadora](https://firebasestorage.googleapis.com/v0/b/hcode-com-br.appspot.com/o/calculadora-hcode.jpg?alt=media&token=5406aa3f-b965-401c-9b4e-654609c78b33)
 
-📌 Mapa Mental - JavaScript Explicado do Zero
+###
 1️⃣ Fundamentos do JavaScript
 JavaScript trabalha com números, textos, listas e objetos.
 2️⃣ Estruturas de Controle
@@ -24,6 +24,8 @@ Botões e ações do usuário são capturados pelo JavaScript para interatividad
 Podemos programar ações para acontecerem após um tempo usando temporizadores.
 🔍 Como Funciona a Calculadora?
 A calculadora escuta os botões, armazena números e faz cálculos.
+
+###
 📌 Resumo
 JavaScript permite criar sites interativos que respondem ao usuário.
 

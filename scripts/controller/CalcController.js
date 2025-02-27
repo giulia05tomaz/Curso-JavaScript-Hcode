@@ -1,128 +1,105 @@
 class CalcController {
 
-    constructor(){
-
+    constructor() {
+        // Cria um objeto de áudio para tocar som ao clicar nos botões
         this._audio = new Audio('click.mp3');
-        this._audioOnOff = false;
-        this._lastOperator = '';
-        this._lastNumber = '';
+        this._audioOnOff = false; // Controle para ativar/desativar o som
 
-        this._operation = [];
-        this._locale = 'pt-BR';
+        this._lastOperator = ''; // Último operador utilizado
+        this._lastNumber = ''; // Último número inserido
+
+        this._operation = []; // Array que armazena as operações
+        this._locale = 'pt-BR'; // Localização para exibição de data e hora
+
+        // Seleciona os elementos da calculadora no HTML
         this._displayCalcEl = document.querySelector("#display");
         this._dateEl = document.querySelector("#data");
         this._timeEl = document.querySelector("#hora");
-        this._currentDate;
+        this._currentDate; // Armazena a data atual
+
+        // Inicializa as configurações da calculadora
         this.initialize();
-        this.initButtonsEvents();
-        this.initKeyboard();
-
+        this.initButtonsEvents(); // Inicializa os eventos dos botões
+        this.initKeyboard(); // Inicializa os eventos do teclado
     }
 
-    pasteFromClipboard(){
-
-        document.addEventListener('paste', e=>{
-
-            let text = e.clipboardData.getData('Text');
-
-            this.displayCalc = parseFloat(text);
-
+    // Função para permitir colar valores do clipboard (Área de transferência)
+    pasteFromClipboard() {
+        document.addEventListener('paste', e => {
+            let text = e.clipboardData.getData('Text'); // Obtém o texto copiado
+            this.displayCalc = parseFloat(text); // Define no display
         });
-
     }
 
-    copyToClipboard(){
-
-        let input = document.createElement('input');
-
-        input.value = this.displayCalc;
-
-        document.body.appendChild(input);
-
-        input.select();
-
-        document.execCommand("Copy");
-
-        input.remove();
-
+    // Função para copiar o valor do display para a área de transferência
+    copyToClipboard() {
+        let input = document.createElement('input'); // Cria um campo de input temporário
+        input.value = this.displayCalc; // Define o valor do input como o número do display
+        document.body.appendChild(input); // Adiciona o input ao corpo do documento
+        input.select(); // Seleciona o valor do input
+        document.execCommand("Copy"); // Copia o valor para o clipboard
+        input.remove(); // Remove o input temporário
     }
 
-    initialize(){
+    // Inicializa as configurações da calculadora
+    initialize() {
+        this.setDisplayDateTime(); // Atualiza a data e a hora no display
 
-        this.setDisplayDateTime()
-
-        setInterval(()=>{
-
-            this.setDisplayDateTime();
-
+        setInterval(() => {
+            this.setDisplayDateTime(); // Atualiza a cada segundo
         }, 1000);
 
-        this.setLastNumberToDisplay();
-        this.pasteFromClipboard();
+        this.setLastNumberToDisplay(); // Exibe o último número digitado
+        this.pasteFromClipboard(); // Ativa a função de colar do clipboard
 
-        document.querySelectorAll('.btn-ac').forEach(btn=>{
-
-            btn.addEventListener('dblclick', e=>{
-
+        // Permite ativar ou desativar o som ao clicar duas vezes no botão AC
+        document.querySelectorAll('.btn-ac').forEach(btn => {
+            btn.addEventListener('dblclick', e => {
                 this.toggleAudio();
-
             });
-
         });
-
     }
 
-    toggleAudio(){
-
+    // Alterna o áudio entre ligado e desligado
+    toggleAudio() {
         this._audioOnOff = !this._audioOnOff;
-
     }
 
-    playAudio(){
-
+    // Toca o áudio quando ativado
+    playAudio() {
         if (this._audioOnOff) {
-
             this._audio.currentTime = 0;
             this._audio.play();
-
         }
-
     }
 
+    // Captura eventos do teclado
     initKeyboard() {
-
-        document.addEventListener('keyup', e=> {
-
+        document.addEventListener('keyup', e => {
             this.playAudio();
 
             switch (e.key) {
-
                 case 'Escape':
-                    this.clearAll();
+                    this.clearAll(); // Limpa tudo
                     break;
-    
                 case 'Backspace':
-                    this.clearEntry();
+                    this.clearEntry(); // Apaga último número
                     break;
-    
-                case '+':    
-                case '-':    
-                case '*':    
-                case '/':    
+                case '+':
+                case '-':
+                case '*':
+                case '/':
                 case '%':
-                    this.addOperation(e.key);
+                    this.addOperation(e.key); // Adiciona operador
                     break;
-    
                 case 'Enter':
                 case '=':
-                    this.calc();
+                    this.calc(); // Realiza o cálculo
                     break;
-    
                 case '.':
                 case ',':
-                    this.addDot();
+                    this.addDot(); // Adiciona ponto decimal
                     break;
-    
                 case '0':
                 case '1':
                 case '2':
@@ -133,386 +110,89 @@ class CalcController {
                 case '7':
                 case '8':
                 case '9':
-                    this.addOperation(parseInt(e.key));
+                    this.addOperation(parseInt(e.key)); // Adiciona número
                     break;
-
                 case 'c':
-                    if (e.ctrlKey) this.copyToClipboard();
+                    if (e.ctrlKey) this.copyToClipboard(); // Copia para clipboard
                     break;
-    
             }
-
-        })
-
+        });
     }
 
-    addEventListenerAll(element, events, fn){
-
+    // Adiciona eventos a múltiplos elementos
+    addEventListenerAll(element, events, fn) {
         events.split(' ').forEach(event => {
-
             element.addEventListener(event, fn, false);
-
-        })
-    
+        });
     }
 
-    clearAll(){
-
+    // Limpa todas as operações
+    clearAll() {
         this._operation = [];
         this._lastNumber = '';
         this._lastOperator = '';
-
         this.setLastNumberToDisplay();
-
     }
 
-    clearEntry(){
-
+    // Apaga o último valor digitado
+    clearEntry() {
         this._operation.pop();
-
         this.setLastNumberToDisplay();
-
     }
 
-    getLastOperation(){
-
-        return this._operation[this._operation.length-1];
-
+    // Retorna o último valor inserido
+    getLastOperation() {
+        return this._operation[this._operation.length - 1];
     }
 
-    setLastOperation(value){
-
-        this._operation[this._operation.length-1] = value;
-
+    // Define o último valor inserido
+    setLastOperation(value) {
+        this._operation[this._operation.length - 1] = value;
     }
 
-    isOperator(value){
-
-        return (['+', '-', '*', '%', '/'].indexOf(value) > -1);
-
+    // Verifica se um valor é um operador matemático
+    isOperator(value) {
+        return ['+', '-', '*', '%', '/'].includes(value);
     }
 
-    pushOperation(value){
-
-        this._operation.push(value);
-
-        if (this._operation.length > 3) {
-
-            this.calc();
-
-        }
-
+    // Executa o cálculo da operação
+    calc() {
+        let result = eval(this._operation.join('')); // Calcula a operação
+        this._operation = [result]; // Salva o resultado
+        this.setLastNumberToDisplay(); // Atualiza o display
     }
 
-    getResult(){
-
-        try{
-            return eval(this._operation.join(''));
-        }catch(e){
-            setTimeout(()=>{
-                this.setError();
-            }, 1);
-        }
-
-    }
-
-    calc(){
-
-        let last = '';
-        
-        this._lastOperator = this.getLastItem();
-
-        if (this._operation.length < 3) {
-
-            let firstItem = this._operation[0];
-
-            this._operation = [firstItem, this._lastOperator, this._lastNumber];
-
-        }
-
-        if (this._operation.length > 3) {
-
-            last = this._operation.pop();
-
-            this._lastNumber = this.getResult();
-
-        } else if (this._operation.length == 3) {
-
-            this._lastNumber = this.getLastItem(false);
-
-        }
-        
-        let result = this.getResult();
-
-        if (last == '%') {
-
-            result /= 100;
-
-            this._operation = [result];
-
-        } else {
-
-            this._operation = [result];
-
-            if (last) this._operation.push(last);
-
-        }
-
-        this.setLastNumberToDisplay();
-
-    }
-
-    getLastItem(isOperator = true){
-
-        let lastItem;
-
-        for (let i = this._operation.length-1; i >= 0; i--){
-
-            if (this.isOperator(this._operation[i]) == isOperator) {
-    
-                lastItem = this._operation[i];
-    
-                break;
-    
-            }
-
-        }
-
-        if (!lastItem) {
-
-            lastItem = (isOperator) ? this._lastOperator : this._lastNumber;
-
-        }
-
-        return lastItem;
-
-    }
-
-    setLastNumberToDisplay(){
-
-        let lastNumber = this.getLastItem(false);
-
+    // Atualiza o display com o último número
+    setLastNumberToDisplay() {
+        let lastNumber = this.getLastOperation(false);
         if (!lastNumber) lastNumber = 0;
-
         this.displayCalc = lastNumber;
-
     }
 
-    addOperation(value){
-
-
-        if (isNaN(this.getLastOperation())) {
-
-            if (this.isOperator(value)) {
-
-                this.setLastOperation(value);
-
-            } else {
-
-                this.pushOperation(value);
-
-                this.setLastNumberToDisplay();
-
-            }
-
-        } else {
-
-            if (this.isOperator(value)){
-
-                this.pushOperation(value);
-
-            } else {
-
-                let newValue = this.getLastOperation().toString() + value.toString();
-
-                this.setLastOperation(newValue);
-
-                this.setLastNumberToDisplay();
-
-            }
-
-        }
-
-    }
-
-    setError(){
-
-        this.displayCalc = "Error";
-        
-    }
-
-    addDot(){
-
+    // Adiciona um ponto decimal ao número
+    addDot() {
         let lastOperation = this.getLastOperation();
-
-        if (typeof lastOperation === 'string' && lastOperation.split('').indexOf('.') > -1) return;
-
+        if (typeof lastOperation === 'string' && lastOperation.includes('.')) return;
         if (this.isOperator(lastOperation) || !lastOperation) {
-
             this.pushOperation('0.');
-
         } else {
-
             this.setLastOperation(lastOperation.toString() + '.');
-
         }
-
         this.setLastNumberToDisplay();
-        
     }
 
-    execBtn(value){
-
-        this.playAudio();
-
-        switch (value) {
-
-            case 'ac':
-                this.clearAll();
-                break;
-
-            case 'ce':
-                this.clearEntry();
-                break;
-
-            case 'soma':
-                this.addOperation('+');
-                break;
-
-            case 'subtracao':
-                this.addOperation('-');
-                break;
-
-            case 'divisao':
-                this.addOperation('/');
-                break;
-
-            case 'multiplicacao':
-                this.addOperation('*');
-                break;
-
-            case 'porcento':
-                this.addOperation('%');
-                break;
-
-            case 'igual':
-                this.calc();
-                break;
-
-            case 'ponto':
-                this.addDot();
-                break;
-
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                this.addOperation(parseInt(value));
-                break;
-
-            default:
-                this.setError();
-                break;
-
-        }
-
-    }
-
-    initButtonsEvents(){
-
-        let buttons = document.querySelectorAll("#buttons > g, #parts > g");
-
-        buttons.forEach((btn, index)=>{
-
-            this.addEventListenerAll(btn, "click drag", e => {
-
-                let textBtn = btn.className.baseVal.replace("btn-","");
-
-                this.execBtn(textBtn);
-
-            })
-
-            this.addEventListenerAll(btn, "mouseover mouseup mousedown", e => {
-
-                btn.style.cursor = "pointer";
-
-            })
-
-        })
-
-    }
-
-    setDisplayDateTime(){
-
-        this.displayDate = this.currentDate.toLocaleDateString(this._locale, {
-            day: "2-digit",
-            month: "long",
-            year: "numeric"
+    // Define a data e hora no display
+    setDisplayDateTime() {
+        this.displayDate = new Date().toLocaleDateString(this._locale, {
+            day: "2-digit", month: "long", year: "numeric"
         });
-        this.displayTime = this.currentDate.toLocaleTimeString(this._locale);
-
+        this.displayTime = new Date().toLocaleTimeString(this._locale);
     }
 
-    get displayTime(){
-
-        return this._timeEl.innerHTML;
-
-    }
-
-    set displayTime(value){
-
-        return this._timeEl.innerHTML = value;
-
-    }
-
-    get displayDate(){
-
-        return this._dateEl.innerHTML;
-
-    }
-
-    set displayDate(value){
-
-        return this._dateEl.innerHTML = value;
-
-    }
-
-    get displayCalc(){
-
-        return this._displayCalcEl.innerHTML;
-
-    }
-
-    set displayCalc(value){
-
-        if (value.toString().length > 10) {
-
-            this.setError();
-
-            return false;
-
-        }
-
-        this._displayCalcEl.innerHTML = value;
-
-    }
-
-    get currentDate(){
-
-        return new Date();
-
-    }
-
-    set currentDate(value){
-
-        this._currentDate = value;
-
-    }
-
+    get displayCalc() { return this._displayCalcEl.innerHTML; }
+    set displayCalc(value) { this._displayCalcEl.innerHTML = value; }
+    get displayDate() { return this._dateEl.innerHTML; }
+    set displayDate(value) { this._dateEl.innerHTML = value; }
+    get displayTime() { return this._timeEl.innerHTML; }
+    set displayTime(value) { this._timeEl.innerHTML = value; }
 }
